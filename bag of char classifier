@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Aug  6 12:33:29 2017
+
+@author: admin
+"""
+
+abnormal = open('abnormal traffic.txt', 'r')
+normal = open('normal traffic.txt', 'r')
+
+ascii_dict = dict()
+for i in range(0,256):
+    ascii_dict[chr(i)] = 0
+
+requests = []
+
+for line in abnormal: #for every network request
+    characters = [c for c in line]
+    dic = ascii_dict.copy()
+    for char in characters:
+        dic[char] += 1
+    requests.append(dic)
+for line in normal: #for every network request
+    characters = [c for c in line]
+    dic = ascii_dict.copy()
+    for char in characters:
+        dic[char] += 1
+    requests.append(dic)

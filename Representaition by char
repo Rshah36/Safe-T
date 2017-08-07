@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jul 31 11:53:47 2017
+
+@author: admin
+"""
+import numpy as np
+
+abnormal = open('abnormal traffic.txt', 'r')
+normal = open('normal traffic.txt', 'r')
+
+ascii_dict = dict()
+for i in range(0,256):
+    ascii_dict[chr(i)] = str(i)
+lines = []
+
+for line in abnormal: #for every network request
+    characters = [c for c in line]
+    for i in range(len(characters)):
+        characters[i] = int(ascii_dict[characters[i]])
+    lines.append(characters)
+        
+for line in normal: #for every network request
+    if len(line) <= 3:
+        del line
+    else:
+        characters = [c for c in line]
+        for i in range(len(characters)):
+            characters[i] = int(ascii_dict[characters[i]])
+        lines.append(characters)
+
+for i_request in range(len(lines)):
+    for i_char in range(len(lines[i_request])):
+        lines[i_request][i_char] = (lines[i_request][i_char] / 255)  
+print(np.unique(list(map(len,lines))))
+
+lines = np.array(lines)
+
+#print(type(lines))
+#print(lines.shape)
+
+##### Min/Max Normalized [0,1] #####
+
+from sklearn.cluster import KMeans
+
+kmeans = KMeans(2, 100, 5).fit(lines)
+#print(kmeans.cluster_centers_)

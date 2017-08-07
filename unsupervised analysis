@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jul 30 12:29:26 2017
+
+@author: admin
+"""
+import numpy as np
+import matplotlib as plt
+from matplotlib import style
+style.use("ggplot")
+import sklearn as skl
+from sklearn.cluster import KMeans
+
+#####
+
+abnormal = open('abnormal traffic.txt', 'r')
+normal = open('normal traffic.txt', 'r')
+
+word_dic = {}
+count = 1
+lines = []
+
+for line in abnormal: #for every network request
+    list = line.split()
+    for i in range(len(list)):
+        if list[i] in word_dic:
+            list[i] = word_dic[list[i]]
+        else:
+            word_dic[list[i]] = count
+            list[i] = count
+            count += 1
+    lines.append(list)
+for line in normal:
+    list = line.split()
+    for i in range(len(list)):
+        if list[i] in word_dic:
+            list[i] = word_dic[list[i]]
+        else:
+            word_dic[list[i]] = count
+            list[i] = count
+            count += 1
+    lines.append(list)
+    
+print(lines)
+print(word_dic)
+    
+#####
+
+#lines = np.asarray(lines)
+#kmeans = KMeans(n_clusters = 2)
+#kmeans.fit(lines)
+#
+#centroids = kmeans.cluster_centers_
+#labels = kmeans.labels_
+#
+#print(centroids)
+#print(labels)
+
+
+
+
+
+
+
+
