@@ -10,12 +10,20 @@ def Parse (file_name):
     requests = []
 
     for line in f:
-        headers = {}
-        if line[0] == 'POST' or 'GET':
+        if len(line) > 0:
+            # print(line)
+            headers = {}
             words = line.split()
-            if words[0] == 'POST':
-                headers['URI'] = words[1]
-            else:
-                headers['URI'] = words[1][1,]
+            print(words)
+            if words[0] == 'POST' or words[0] == 'GET':
+                # print('words =', words)
+                if words[0] == 'POST':
+                    headers['URI'] = words[1]
+                else:
+                    headers['URI'] = words[1][1,]
 
-Parse(normal.txt)
+            requests.append(headers)
+
+    return (requests)
+
+(Parse('normal traffic.txt'))
