@@ -1,3 +1,7 @@
+ascii_dict = dict()
+for i in range(0,256):
+    ascii_dict[chr(i)] = str(i)
+
 def Parse (file_name):
     """
     Will parse HTTP request file with labels "Normal"/"Abnormal" at the end into header sections/variables
@@ -10,20 +14,38 @@ def Parse (file_name):
     requests = []
 
     for line in f:
-        if len(line) > 0:
+        if len(line) > 1:
             # print(line)
             headers = {}
             words = line.split()
-            print(words)
+            # print(words)
             if words[0] == 'POST' or words[0] == 'GET':
                 # print('words =', words)
                 if words[0] == 'POST':
                     headers['URI'] = words[1]
                 else:
-                    headers['URI'] = words[1][1,]
-
+                    headers['URI'] = words[1][1:]
+                headers['Host'] = words[3][0:13]
+                headers['User Agent'] = line[(line.find('User-Agent:') + 12):line.find('Accept:')]
+                headers['Accept'] = line[(line.find('Accept:') + 8):line.find('Accept-Language:')]
+                headers['Accept Language'] = line[(line.find('Accept-Language:') + 17):line.find('Accept-Encoding:')]
+                headers['Accept Encoding'] = line[(line.find('Accept-Encoding:') + 17):line.find('DNT:')]
             requests.append(headers)
 
     return (requests)
 
-(Parse('normal traffic.txt'))
+def Normalize (headers):
+    """
+    :param headers: a list of dictionaries mapping each header to its information, with each dictionary representating an HTTP request
+    :return: The same list with the information normalized to ASCII character assignments [0:1]
+    """
+    for dict in headers:
+        for key in dict:
+            normalized = []
+            for i in range(len(dict[key])):
+                normalized.append(float(ascii_dict[dict[key][i]])/255.0)
+            dict[key] = normalized
+
+    return headers
+
+print(Normalize(Parse('normal traffic.txt')))
