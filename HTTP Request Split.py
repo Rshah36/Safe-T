@@ -48,4 +48,17 @@ def Normalize (headers):
 
     return headers
 
-print(Normalize(Parse('normal traffic.txt')))
+
+def Pad (headers):
+    """
+    :param norm_headers: normalized headers; list of dictionaries
+    :return: The same list with every header having a vlaue of 1000 characters long (len(list) = 1000)
+    """
+    for dict in headers:
+        for key in dict:
+            # print(dict[key])
+            for i in range (1000 - len(dict[key])):
+                dict[key].append(0)
+    return headers
+
+(Pad(Normalize(Parse('normal traffic.txt'))))
