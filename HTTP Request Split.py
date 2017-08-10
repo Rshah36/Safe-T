@@ -61,4 +61,75 @@ def Pad (headers):
                 dict[key].append(0)
     return headers
 
-(Pad(Normalize(Parse('normal traffic.txt'))))
+def DictToLists (headers):
+    """
+    Transform list of dictionaries (of which the values are lists), to a list of lists
+    """
+    header_list = []
+    for dict in headers:
+        request_list = []
+        for key in dict:
+            request_list.append(dict[key])
+        header_list.append(request_list)
+
+    return header_list
+
+def NeuralNetwork (input1, input2):
+    """
+    :param input1: Normalized & Padded list of lists; NORMAL EXAMPLES
+    :param input2: Normalized & Padded list of lists; ABNORMAL EXAMPLES
+    :return: ANN output will be 0 if normal, 1 if abnormal
+    """
+    import numpy as np
+
+    def nonlin (x, deriv = False):
+        """
+        sigmoid function 
+        """
+        if deriv == True:
+            return x*(1-x)
+        return 1/(1+np.exp(-x))
+
+    #defining all inputs
+    input1.append(input2)
+    X = np.array(input1)
+    #defining outputs for 1
+    output1 = []
+    for i in range (len(input1)):
+        output1.append(0)
+    #defining outputs for 2
+    output2 = []
+    for i in range(len(input2)):
+        output2.append(1)
+    #defining all outputs
+    merge = output1 + output2
+    y = []
+    y.append(merge)
+    Y = np.array(y).T
+
+    #seed random; DETERMINISTIC
+    np.random.seed(1)
+
+    #initialize weights with mean 0
+    syn0 = 2*np.random.random((3,1)) - 1
+
+    print(X)
+
+    for iteration in xrange(10):
+        #forward propogation
+        l0 = X
+        l1 = nonlin(np.dot(l0, syn0))
+
+        l1_error = y - l1
+
+        l1_delta = l1_error * nonlin(l1, True)
+
+        #update weights
+        syn0 += np.dot(l0.T, l1_delta)
+
+    return l1
+
+norm = DictToLists(Pad(Normalize(Parse('normal traffic.txt'))))
+abnorm = DictToLists(Pad(Normalize(Parse('abnormal traffic.txt'))))
+
+NeuralNetwork(norm, abnorm)
