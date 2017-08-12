@@ -1,8 +1,9 @@
 ascii_dict = dict()
-for i in range(0,256):
+for i in range(0, 256):
     ascii_dict[chr(i)] = str(i)
 
-def Parse (file_name):
+
+def Parse(file_name):
     """
     Will parse HTTP request file with labels "Normal"/"Abnormal" at the end into header sections/variables
     :param file_name: 
@@ -34,22 +35,23 @@ def Parse (file_name):
 
     return (requests)
 
-def Normalize (headers):
+
+def Normalize(headers):
     """
-    :param headers: a list of dictionaries mapping each header to its information, with each dictionary representating an HTTP request
+    :param headers: a list of dictionaries mapping each header to its information, with each dictionary representing an HTTP request
     :return: The same list with the information normalized to ASCII character assignments [0:1]
     """
     for dict in headers:
         for key in dict:
             normalized = []
             for i in range(len(dict[key])):
-                normalized.append(float(ascii_dict[dict[key][i]])/255.0)
+                normalized.append(float(ascii_dict[dict[key][i]]) / 255.0)
             dict[key] = normalized
 
     return headers
 
 
-def Pad (headers):
+def Pad(headers):
     """
     :param norm_headers: normalized headers; list of dictionaries
     :return: The same list with every header having a vlaue of 1000 characters long (len(list) = 1000)
@@ -57,11 +59,12 @@ def Pad (headers):
     for dict in headers:
         for key in dict:
             # print(dict[key])
-            for i in range (1000 - len(dict[key])):
+            for i in range(1000 - len(dict[key])):
                 dict[key].append(0)
     return headers
 
-def DictToLists (headers):
+
+def DictToLists(headers):
     """
     Transform list of dictionaries (of which the values are lists), to a list of lists
     """
@@ -74,7 +77,8 @@ def DictToLists (headers):
 
     return header_list
 
-def NeuralNetwork (input1, input2):
+
+def NeuralNetwork(input1, input2):
     """
     :param input1: Normalized & Padded list of lists; NORMAL EXAMPLES
     :param input2: Normalized & Padded list of lists; ABNORMAL EXAMPLES
@@ -82,41 +86,44 @@ def NeuralNetwork (input1, input2):
     """
     import numpy as np
 
-    def nonlin (x, deriv = False):
+    def nonlin(x, deriv=False):
         """
         sigmoid function 
         """
         if deriv == True:
-            return x*(1-x)
-        return 1/(1+np.exp(-x))
+            return x * (1 - x)
+        return 1 / (1 + np.exp(-x))
 
-    #defining all inputs
+    # defining all inputs
     input1.append(input2)
     X = np.array(input1)
-    #defining outputs for 1
+    # defining outputs for 1
     output1 = []
-    for i in range (len(input1)):
+    for i in range(len(input1)):
         output1.append(0)
-    #defining outputs for 2
+    # defining outputs for 2
     output2 = []
     for i in range(len(input2)):
         output2.append(1)
-    #defining all outputs
+    # defining all outputs
     merge = output1 + output2
     y = []
     y.append(merge)
     Y = np.array(y).T
 
-    #seed random; DETERMINISTIC
+    # seed random; DETERMINISTIC
     np.random.seed(1)
 
-    #initialize weights with mean 0
-    syn0 = 2*np.random.random((3,1)) - 1
+    # initialize weights with mean 0
+    syn0 = 2 * np.random.random((3, 1)) - 1
 
-    print(X)
+    # print(X)
+
+    # print(X.shape)
+    # print(syn0.shape)
 
     for iteration in xrange(10):
-        #forward propogation
+        # forward propogation
         l0 = X
         l1 = nonlin(np.dot(l0, syn0))
 
@@ -124,10 +131,11 @@ def NeuralNetwork (input1, input2):
 
         l1_delta = l1_error * nonlin(l1, True)
 
-        #update weights
+        # update weights
         syn0 += np.dot(l0.T, l1_delta)
 
     return l1
+
 
 norm = DictToLists(Pad(Normalize(Parse('normal traffic.txt'))))
 abnorm = DictToLists(Pad(Normalize(Parse('abnormal traffic.txt'))))
